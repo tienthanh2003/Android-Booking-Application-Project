@@ -1,0 +1,21 @@
+<resources>
+    <style name="Theme.App.Login" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#1E88E5</item>
+        <item name="colorPrimaryVariant">#1565C0</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <item name="colorSecondary">#FFB300</item>
+        <item name="colorSecondaryVariant">#FF8F00</item>
+        <item name="colorOnSecondary">#000000</item>
+
+        <item name="android:windowBackground">#FAFAFA</item>
+        <item name="android:statusBarColor">#1565C0</item>
+
+        <item name="colorOnBackground">#212121</item>
+        <!-- Nếu dùng thuộc tính custom, khai báo ở attrs.xml -->
+        <!-- <item name="colorBackground">#FAFAFA</item> -->
+
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#212121</item>
+    </style>
+</resources>
