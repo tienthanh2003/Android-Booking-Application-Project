@@ -37,7 +37,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Tên đăng nhập"
+        android:hint="Email"
         android:backgroundTint="?attr/colorPrimary"
         app:boxStrokeColor="?attr/colorPrimary"
         app:boxBackgroundColor="?attr/colorSurface"
