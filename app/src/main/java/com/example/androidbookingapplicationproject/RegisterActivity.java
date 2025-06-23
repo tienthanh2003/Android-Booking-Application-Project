@@ -2,78 +2,118 @@ package com.example.androidbookingapplicationproject;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
-import android.widget.ArrayAdapter;
+import android.util.Patterns;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.androidbookingapplicationproject.db.DatabaseHelper;
 
 import java.util.Calendar;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    private EditText etEmail, etFullName, etPassword, etPhone, etDob;
+    private Spinner spinnerGender;
+    private Button btnSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Xử lý Spinner giới tính
-        Spinner spinnerGender = findViewById(R.id.spinnerGender);
-        if (spinnerGender != null) {
-            String[] genderArray = {"Nam", "Nữ", "Khác"};
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.simple_spinner_item,
-                    genderArray
-            );
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerGender.setAdapter(adapter);
-        }
+        // Ánh xạ view
+        etEmail = findViewById(R.id.etSignupEmail);
+        etFullName = findViewById(R.id.etSignupFullname);
+        etPassword = findViewById(R.id.etSignupPassword);
+        etPhone = findViewById(R.id.etSignupPhone);
+        etDob = findViewById(R.id.etDob);
+        spinnerGender = findViewById(R.id.spinnerGender);
+        btnSignUp = findViewById(R.id.btnSignUp);
 
-        // Xử lý DatePickerDialog cho EditText ngày sinh
-        EditText etDob = findViewById(R.id.etDob);
-        if (etDob != null) {
-            etDob.setOnClickListener(v -> showDatePickerDialog());
-        }
+        // Spinner giới tính
+        String[] genderArray = {"Nam", "Nữ", "Khác"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, genderArray
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGender.setAdapter(adapter);
 
-        // Xử lý nút đăng ký
-        Button btnSignUp = findViewById(R.id.btnSignUp);
-        if (btnSignUp != null) {
-            btnSignUp.setOnClickListener(view -> {
-                Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            });
-        }
+        // Ngày sinh
+        etDob.setOnClickListener(v -> showDatePickerDialog());
+
+        // Sự kiện đăng ký
+        btnSignUp.setOnClickListener(view -> handleRegister());
     }
 
     private void showDatePickerDialog() {
-        // Lấy ngày hiện tại làm giá trị mặc định
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        // Tạo DatePickerDialog
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
-                    // Định dạng ngày tháng năm: dd/MM/yyyy
                     String selectedDate = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
-                    EditText etDob = findViewById(R.id.etDob);
                     etDob.setText(selectedDate);
                 },
                 year, month, day
         );
-
-        // Thiết lập ngày tối đa là ngày hiện tại (không cho chọn ngày sinh trong tương lai)
         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-
         datePickerDialog.show();
+    }
+
+    private void handleRegister() {
+        String email = etEmail.getText().toString().trim();
+        String fullname = etFullName.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
+        String dob = etDob.getText().toString().trim();
+        String gender = spinnerGender.getSelectedItem().toString();
+
+        // Kiểm tra dữ liệu
+        if (email.isEmpty() || fullname.isEmpty() || password.isEmpty()
+                || phone.isEmpty() || dob.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            dbHelper.createDatabase();
+            db = dbHelper.openDatabase();
+
+            // Kiểm tra email đã tồn tại
+            cursor = db.rawQuery("SELECT * FROM Users WHERE Email = ?", new String[]{email});
+            if (cursor.moveToFirst()) {
+                Toast.makeText(this, "Email đã tồn tại!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Thêm người dùng
+            String sql = "INSERT INTO Users (Email, Name, Password, Phone, Dob, Gender, Role) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            db.execSQL(sql, new Object[]{email, fullname, password, phone, dob, gender, "customer"});
+
+            Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Lỗi đăng ký: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
+        }
     }
 }

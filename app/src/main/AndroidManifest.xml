@@ -32,6 +32,11 @@
             android:name=".RegisterActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".CustomerDashboardActivity"
+            android:exported="true">
+        </activity>
+
 
         <activity android:name=".CartActivity" />
     </application>
