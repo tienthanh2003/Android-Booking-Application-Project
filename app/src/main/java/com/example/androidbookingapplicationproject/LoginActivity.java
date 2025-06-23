@@ -61,14 +61,24 @@ public class LoginActivity extends AppCompatActivity {
 
             if (cursor.moveToFirst()) {
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("Name"));
-                String role = cursor.getString(cursor.getColumnIndexOrThrow("Role"));
+                String role = cursor.getString(cursor.getColumnIndexOrThrow("Role")).toLowerCase();
 
                 Toast.makeText(this, "Chào " + name + " (" + role + ")", Toast.LENGTH_LONG).show();
 
+                Intent intent;
+                if (role.equals("staff")) {
+                    intent = new Intent(LoginActivity.this, MainActivity.class); // màn staff
+                } else if (role.equals("customer")) {
+                    intent = new Intent(LoginActivity.this, CustomerDashboardActivity.class); // màn khách
+                } else {
+                    Toast.makeText(this, "Không xác định được vai trò người dùng!", Toast.LENGTH_SHORT).show();
+                    cursor.close();
+                    db.close();
+                    return;
+                }
 
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                 startActivity(intent);
-                 finish();
+                startActivity(intent);
+                finish();
             } else {
                 Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
             }
@@ -81,4 +91,5 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "Lỗi đăng nhập: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
 }
