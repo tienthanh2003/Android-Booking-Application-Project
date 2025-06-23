@@ -1,6 +1,7 @@
 package com.example.androidbookingapplicationproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -24,16 +25,21 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Ánh xạ View
+        // Nếu đã đăng nhập trước đó, vào thẳng MainActivity
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        if (prefs.getInt("userId", -1) != -1) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
+
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
 
-        // Xử lý đăng nhập
         btnLogin.setOnClickListener(view -> handleLogin());
 
-        // Chuyển sang màn hình đăng ký
         tvRegister.setOnClickListener(view -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -62,20 +68,24 @@ public class LoginActivity extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("Name"));
                 String role = cursor.getString(cursor.getColumnIndexOrThrow("Role"));
+                int userId = cursor.getInt(cursor.getColumnIndexOrThrow("UserId"));
+
+                // Lưu vào SharedPreferences
+                getSharedPreferences("UserPrefs", MODE_PRIVATE)
+                        .edit()
+                        .putInt("userId", userId)
+                        .apply();
 
                 Toast.makeText(this, "Chào " + name + " (" + role + ")", Toast.LENGTH_LONG).show();
 
-
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                 startActivity(intent);
-                 finish();
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
             } else {
                 Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
             }
 
             cursor.close();
             db.close();
-
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Lỗi đăng nhập: " + e.getMessage(), Toast.LENGTH_LONG).show();

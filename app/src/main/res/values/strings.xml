@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Android Booking Application Project</string>
+    <string name="avatar">Ảnh đại diện</string>
+    <string name="sample_username">Nguyễn Văn A</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="email">Email</string>
+    <string name="phone">Số điện thoại</string>
+    <string name="new_password">Mật khẩu mới</string>
+    <string name="save_changes">Lưu thay đổi</string>
 </resources>

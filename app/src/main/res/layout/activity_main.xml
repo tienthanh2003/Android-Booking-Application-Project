@@ -246,6 +246,7 @@
 
             <!-- Mục 6: Hồ sơ cá nhân -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardProfile"
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
@@ -276,7 +277,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </GridLayout>
-
         <!-- Nút Đăng xuất -->
         <Button
             android:id="@+id/btnLogout"

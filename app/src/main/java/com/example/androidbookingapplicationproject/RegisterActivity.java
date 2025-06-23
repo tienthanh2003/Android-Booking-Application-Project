@@ -1,79 +1,87 @@
 package com.example.androidbookingapplicationproject;
 
-import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
-import android.widget.ArrayAdapter;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.Calendar;
+import com.example.androidbookingapplicationproject.db.DatabaseHelper;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    private EditText etEmail, etFullname, etPassword, etPhone;
+    private Button btnSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Xử lý Spinner giới tính
-        Spinner spinnerGender = findViewById(R.id.spinnerGender);
-        if (spinnerGender != null) {
-            String[] genderArray = {"Nam", "Nữ", "Khác"};
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.simple_spinner_item,
-                    genderArray
-            );
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerGender.setAdapter(adapter);
-        }
+        etEmail = findViewById(R.id.etSignupEmail);
+        etFullname = findViewById(R.id.etSignupFullname);
+        etPassword = findViewById(R.id.etSignupPassword);
+        etPhone = findViewById(R.id.etSignupUsername);
+        btnSignUp = findViewById(R.id.btnSignUp);
 
-        // Xử lý DatePickerDialog cho EditText ngày sinh
-        EditText etDob = findViewById(R.id.etDob);
-        if (etDob != null) {
-            etDob.setOnClickListener(v -> showDatePickerDialog());
-        }
-
-        // Xử lý nút đăng ký
-        Button btnSignUp = findViewById(R.id.btnSignUp);
-        if (btnSignUp != null) {
-            btnSignUp.setOnClickListener(view -> {
-                Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            });
-        }
+        btnSignUp.setOnClickListener(v -> handleSignUp());
     }
 
-    private void showDatePickerDialog() {
-        // Lấy ngày hiện tại làm giá trị mặc định
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+    private void handleSignUp() {
+        String email = etEmail.getText().toString().trim();
+        String name = etFullname.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
 
-        // Tạo DatePickerDialog
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                (view, selectedYear, selectedMonth, selectedDay) -> {
-                    // Định dạng ngày tháng năm: dd/MM/yyyy
-                    String selectedDate = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
-                    EditText etDob = findViewById(R.id.etDob);
-                    etDob.setText(selectedDate);
-                },
-                year, month, day
-        );
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(name)
+                || TextUtils.isEmpty(password) || TextUtils.isEmpty(phone)) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Thiết lập ngày tối đa là ngày hiện tại (không cho chọn ngày sinh trong tương lai)
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        datePickerDialog.show();
+        try {
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            dbHelper.createDatabase();
+            SQLiteDatabase db = dbHelper.openDatabase();
+
+            Cursor check = db.rawQuery("SELECT 1 FROM Users WHERE Email = ?", new String[]{email});
+            if (check.moveToFirst()) {
+                Toast.makeText(this, "Email đã tồn tại!", Toast.LENGTH_SHORT).show();
+                check.close();
+                db.close();
+                return;
+            }
+            check.close();
+
+            ContentValues values = new ContentValues();
+            values.put("Email", email);
+            values.put("Password", password);
+            values.put("Name", name);
+            values.put("Phone", phone);
+            values.put("Role", "user");
+
+            long rowId = db.insert("Users", null, values);
+            db.close();
+
+            if (rowId != -1) {
+                Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            } else {
+                Toast.makeText(this, "Đăng ký thất bại! Không thể thêm vào DB", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi khi đăng ký: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 }
