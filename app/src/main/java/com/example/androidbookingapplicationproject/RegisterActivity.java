@@ -2,11 +2,12 @@ package com.example.androidbookingapplicationproject;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.androidbookingapplicationproject.db.DatabaseHelper;
 
 import java.util.Calendar;
@@ -72,30 +73,47 @@ public class RegisterActivity extends AppCompatActivity {
         String dob = etDob.getText().toString().trim();
         String gender = spinnerGender.getSelectedItem().toString();
 
+        // Kiểm tra dữ liệu
         if (email.isEmpty() || fullname.isEmpty() || password.isEmpty()
                 || phone.isEmpty() || dob.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
         try {
             DatabaseHelper dbHelper = new DatabaseHelper(this);
             dbHelper.createDatabase();
-            SQLiteDatabase db = dbHelper.openDatabase();
+            db = dbHelper.openDatabase();
 
-            // Chèn dữ liệu vào bảng Users
+            // Kiểm tra email đã tồn tại
+            cursor = db.rawQuery("SELECT * FROM Users WHERE Email = ?", new String[]{email});
+            if (cursor.moveToFirst()) {
+                Toast.makeText(this, "Email đã tồn tại!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Thêm người dùng
             String sql = "INSERT INTO Users (Email, Name, Password, Phone, Dob, Gender, Role) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
             db.execSQL(sql, new Object[]{email, fullname, password, phone, dob, gender, "customer"});
 
-            db.close();
-
             Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
+
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Lỗi đăng ký: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
 }
