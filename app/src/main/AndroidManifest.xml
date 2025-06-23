@@ -33,6 +33,7 @@
             android:exported="true">
         </activity>
 
+        <activity android:name=".CartActivity" />
     </application>
 
 </manifest>
