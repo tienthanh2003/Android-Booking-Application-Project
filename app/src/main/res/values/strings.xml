@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Android Booking Application Project</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZG90aWVudGhhbmgiLCJhIjoiY21jOHN1cnRkMWZ6ejJpcHdnZGNqdzBwayJ9.PGDFlLXXPRPSJ2IM5J_RWw</string>
+
 </resources>
