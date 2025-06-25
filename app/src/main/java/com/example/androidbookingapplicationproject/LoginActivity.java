@@ -66,10 +66,12 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Chào " + name + " (" + role + ")", Toast.LENGTH_LONG).show();
 
                 Intent intent;
+
                 if (role.equals("staff")) {
                     intent = new Intent(LoginActivity.this, MainActivity.class); // màn staff
                 } else if (role.equals("customer")) {
-                    intent = new Intent(LoginActivity.this, CustomerDashboardActivity.class); // màn khách
+                    intent = new Intent(LoginActivity.this, CustomerDashboardActivity.class);
+                    intent.putExtra("userName", name);// màn khách
                 } else {
                     Toast.makeText(this, "Không xác định được vai trò người dùng!", Toast.LENGTH_SHORT).show();
                     cursor.close();

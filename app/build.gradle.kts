@@ -41,4 +41,9 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(files("libs/sqlite-android-3500100.aar"))
+    implementation("com.mapbox.maps:android:11.1.0")
+
+
 }
+
+
