@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFF">
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,39 +41,35 @@
                     android:textColor="#777" />
 
                 <TextView
-                    android:id="@+id/tvStaffName"
+                    android:id="@+id/tvCustomerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nguyễn Văn A"
+                    android:text="Nguyễn Thị B"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#000" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Search box -->
+        <!-- Search -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="24dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#FFFFFF"
             app:strokeColor="#CCCCCC"
             app:strokeWidth="1dp">
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Tìm kiếm..."
+                android:hint="Tìm kiếm dịch vụ..."
+                android:textColor="#000"
+                android:textColorHint="#888888"
                 android:background="@android:color/transparent"
                 android:paddingHorizontal="16dp"
-                android:inputType="text"
-                android:textColor="#000"
-                android:textColorHint="#888888"/>
+                android:inputType="text" />
         </com.google.android.material.card.MaterialCardView>
-
-
 
         <!-- Grid chức năng -->
         <GridLayout
@@ -83,32 +79,29 @@
             android:useDefaultMargins="true"
             android:alignmentMode="alignMargins">
 
-            <!-- Reusable Card Item -->
-            <!-- Mục 1: Đặt chỗ -->
+            <!-- Mỗi mục chức năng: Gói, Lịch sử, Giỏ hàng, Thanh toán, Bản đồ, Chat, Thông báo, Tài khoản -->
+            <!-- Ví dụ: Gói sản phẩm -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
-
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/ic_booking"
-                        app:tint="#6200EE" />
-
+                        android:src="@drawable/ic_packages"
+                        app:tint="#3F51B5" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đặt chỗ"
+                        android:text="Gói sản phẩm"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginTop="8dp"
@@ -116,27 +109,24 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Mục 2: Lịch sử -->
+            <!-- Lịch sử -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
-
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_history"
                         app:tint="#43A047" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -148,8 +138,9 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Mục 3: Gói dịch vụ -->
+            <!-- Giỏ hàng -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardCart"
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
@@ -166,13 +157,13 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/ic_packages"
-                        app:tint="#FB8C00" />
+                        android:src="@drawable/ic_cart"
+                        app:tint="#9C27B0" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Gói dịch vụ"
+                        android:text="Giỏ hàng"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginTop="8dp"
@@ -180,31 +171,87 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Mục 4: Tin nhắn -->
+            <!-- Thanh toán -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_payment"
+                        app:tint="#FF9800" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thanh toán"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
+            <!-- Bản đồ -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMap"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_map"
+                        app:tint="#03A9F4" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bản đồ"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Chat -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_chat"
-                        app:tint="#039BE5" />
-
+                        app:tint="#9C27B0" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hỗ trợ"
+                        android:text="Chat"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginTop="8dp"
@@ -212,27 +259,24 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Mục 5: Thông báo -->
+            <!-- Thông báo -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
-
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_notifications"
                         app:tint="#E53935" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -244,43 +288,37 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Mục 6: Hồ sơ cá nhân -->
+            <!-- Tài khoản -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-
+                app:cardElevation="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
-
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_profile"
                         app:tint="#6D4C41" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hồ sơ"
+                        android:text="Tài khoản"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginTop="8dp"
                         android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <!-- Mục 7: Giỏ hàng -->
-
         </GridLayout>
 
-        <!-- Nút Đăng xuất -->
+        <!-- Nút đăng xuất -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
@@ -290,8 +328,8 @@
             android:layout_marginTop="24dp"
             android:backgroundTint="@android:color/holo_red_dark"
             android:textColor="@android:color/white"
+            android:padding="12dp"
             app:icon="@drawable/ic_logout"
-            app:iconTint="@android:color/white"
-            android:padding="12dp"/>
+            app:iconTint="@android:color/white"/>
     </LinearLayout>
 </ScrollView>
