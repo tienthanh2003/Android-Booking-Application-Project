@@ -17,19 +17,19 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Bắt sự kiện nút đăng xuất
+        // Nút đăng xuất
         Button btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // Chuyển về màn hình đăng nhập
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xoá stack
-                startActivity(intent);
-            }
+        btnLogout.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
 
-
+        // Mở chức năng quản lý gói
+        CardView cardManagePackages = findViewById(R.id.cardManagePackages);
+        cardManagePackages.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ManagePackagesActivity.class);
+            startActivity(intent);
+        });
     }
 }

@@ -150,6 +150,7 @@
 
             <!-- Mục 3: Gói dịch vụ -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardManagePackages"
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
@@ -172,7 +173,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Gói dịch vụ"
+                        android:text="Q.lý gói"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginTop="8dp"

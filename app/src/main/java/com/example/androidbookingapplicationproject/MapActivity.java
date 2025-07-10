@@ -93,4 +93,11 @@ public class MapActivity extends AppCompatActivity {
         super.onDestroy();
         mapView.onDestroy();
     }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
 }
