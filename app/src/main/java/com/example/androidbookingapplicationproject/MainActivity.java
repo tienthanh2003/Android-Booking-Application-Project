@@ -31,5 +31,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, ManagePackagesActivity.class);
             startActivity(intent);
         });
+
+        CardView cardFacilities = findViewById(R.id.cardManageFacilities);
+        cardFacilities.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ManageFacilitiesActivity.class);
+            startActivity(intent);
+        });
+
     }
 }

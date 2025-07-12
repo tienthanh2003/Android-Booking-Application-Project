@@ -4,6 +4,7 @@
     package="com.example.androidbookingapplicationproject">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -42,6 +43,11 @@
         <activity android:name=".CartActivity" />
         <activity android:name=".MapActivity" />
         <activity android:name=".ManagePackagesActivity" />
+        <activity android:name=".ManageFacilitiesActivity" />
+        <activity android:name=".SelectPackageActivity" />
+        <activity android:name=".OTPActivity"/>
+        <activity android:name=".NotificationActivity"/>
+
         <meta-data
             android:name="com.mapbox.token"
             android:value="@string/mapbox_access_token" />

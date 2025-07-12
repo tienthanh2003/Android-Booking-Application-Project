@@ -60,7 +60,7 @@ public class ManagePackagesActivity extends AppCompatActivity {
             int capacity = cursor.getInt(cursor.getColumnIndexOrThrow("Capacity"));
             int price = cursor.getInt(cursor.getColumnIndexOrThrow("Price"));
 
-            packageList.add(name + " - " + capacity + " chỗ - " + price + "k");
+            packageList.add(name + " - " + capacity + " chỗ - " + price);
             packageIds.add(id);
         }
 
