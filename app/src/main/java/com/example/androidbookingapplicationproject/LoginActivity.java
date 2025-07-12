@@ -51,15 +51,16 @@ public class LoginActivity extends AppCompatActivity {
 
         try {
             DatabaseHelper dbHelper = new DatabaseHelper(this);
-            dbHelper.createDatabase();
+            dbHelper.createDatabase(); // nếu bạn sử dụng database từ assets
             SQLiteDatabase db = dbHelper.openDatabase();
 
             Cursor cursor = db.rawQuery(
-                    "SELECT * FROM Users WHERE Email = ? AND Password = ?",
+                    "SELECT * FROM User WHERE Email = ? AND Password = ?",
                     new String[]{email, password}
             );
 
             if (cursor.moveToFirst()) {
+                int userId = cursor.getInt(cursor.getColumnIndexOrThrow("UserId"));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("Name"));
                 String role = cursor.getString(cursor.getColumnIndexOrThrow("Role")).toLowerCase();
 
@@ -68,10 +69,15 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent;
 
                 if (role.equals("staff")) {
-                    intent = new Intent(LoginActivity.this, MainActivity.class); // màn staff
+                    intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("userId", userId);
+                    intent.putExtra("userName", name);
+                    intent.putExtra("email", email);
                 } else if (role.equals("customer")) {
                     intent = new Intent(LoginActivity.this, CustomerDashboardActivity.class);
-                    intent.putExtra("userName", name);// màn khách
+                    intent.putExtra("userId", userId);
+                    intent.putExtra("userName", name);
+                    intent.putExtra("email", email); // gửi email
                 } else {
                     Toast.makeText(this, "Không xác định được vai trò người dùng!", Toast.LENGTH_SHORT).show();
                     cursor.close();
@@ -79,19 +85,19 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                cursor.close();
+                db.close();
+
                 startActivity(intent);
                 finish();
+
             } else {
                 Toast.makeText(this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
             }
-
-            cursor.close();
-            db.close();
 
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Lỗi đăng nhập: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
-
 }

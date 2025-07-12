@@ -93,14 +93,14 @@ public class RegisterActivity extends AppCompatActivity {
             db = dbHelper.openDatabase();
 
             // Kiểm tra email đã tồn tại
-            cursor = db.rawQuery("SELECT * FROM Users WHERE Email = ?", new String[]{email});
+            cursor = db.rawQuery("SELECT * FROM User WHERE Email = ?", new String[]{email});
             if (cursor.moveToFirst()) {
                 Toast.makeText(this, "Email đã tồn tại!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Thêm người dùng
-            String sql = "INSERT INTO Users (Email, Name, Password, Phone, Dob, Gender, Role) " +
+            String sql = "INSERT INTO User (Email, Name, Password, Phone, Dob, Gender, Role) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
             db.execSQL(sql, new Object[]{email, fullname, password, phone, dob, gender, "customer"});
 

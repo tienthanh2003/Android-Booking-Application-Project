@@ -14,7 +14,7 @@ import java.io.OutputStream;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static String DB_NAME = "booking_app_updated1.db";
+    private static String DB_NAME = "bookingapp.db";
     private static String DB_PATH = "";
     private final Context context;
     private SQLiteDatabase database;
