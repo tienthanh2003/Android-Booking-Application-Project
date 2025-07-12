@@ -47,7 +47,9 @@
         <activity android:name=".SelectPackageActivity" />
         <activity android:name=".OTPActivity"/>
         <activity android:name=".NotificationActivity"/>
-
+        <activity android:name=".ApproveBookingActivity"/>
+        <activity android:name=".BookingListActivity"/>
+        <activity android:name=".StaffNotificationActivity"/>
         <meta-data
             android:name="com.mapbox.token"
             android:value="@string/mapbox_access_token" />

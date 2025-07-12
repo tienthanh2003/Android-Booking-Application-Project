@@ -96,9 +96,13 @@ public class CustomerDashboardActivity extends AppCompatActivity {
                 requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
                         NOTIFICATION_PERMISSION_REQUEST_CODE);
             } else {
+                checkTodayBookingAndNotify();
+                checkUnreadBookingNotification();
                 checkUnpaidCartAndNotify();
             }
         } else {
+            checkTodayBookingAndNotify();
+            checkUnreadBookingNotification();
             checkUnpaidCartAndNotify();
         }
     }
@@ -123,6 +127,101 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         cursor.close();
         db.close();
     }
+
+    // thông báo đơn đã duyệt
+    private void checkUnreadBookingNotification() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        SQLiteDatabase db = dbHelper.openDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT Title, Content FROM Notifications WHERE UserId = ? AND Type = 'booking' AND IsRead = 0",
+                new String[]{String.valueOf(userId)}
+        );
+
+        if (cursor.moveToFirst()) {
+            String title = cursor.getString(0);
+            String content = cursor.getString(1);
+
+            // Gửi thông báo hệ thống
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "booking_channel")
+                    .setSmallIcon(R.drawable.ic_notifications)
+                    .setContentTitle(title)
+                    .setContentText(content)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
+
+            try {
+                NotificationManagerCompat.from(this).notify(1002, builder.build());
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+
+            // Đánh dấu đã đọc để không thông báo lại lần sau
+            db.execSQL("UPDATE Notifications SET IsRead = 1 WHERE UserId = ? AND Type = 'booking'", new Object[]{userId});
+        }
+
+        cursor.close();
+        db.close();
+    }
+
+
+    // thông báo có đơn đặt trong ngày
+    private void checkTodayBookingAndNotify() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        SQLiteDatabase db = dbHelper.openDatabase();
+
+        // Lấy ngày hiện tại theo định dạng yyyy-M-d (vd: 2025-7-12)
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-M-d", java.util.Locale.getDefault());
+        String todayStr = sdf.format(new java.util.Date());
+
+        // Truy vấn Booking có ngày hôm nay
+        Cursor cursor = db.rawQuery(
+                "SELECT BookingId, BookingDate, StartTime FROM Bookings " +
+                        "WHERE UserId = ? AND BookingDate LIKE ? AND Status = 'Đã duyệt'",
+                new String[]{String.valueOf(userId), "%" + todayStr + "%"}
+        );
+
+        if (cursor.moveToFirst()) {
+            int bookingId = cursor.getInt(0);
+            String date = cursor.getString(1);
+            String time = cursor.getString(2);
+
+            String title = "⏰ Nhắc lịch đặt hôm nay";
+            String content = "Bạn có lịch đặt vào " + time + " hôm nay (" + date + ").";
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "booking_channel")
+                    .setSmallIcon(R.drawable.ic_notifications)
+                    .setContentTitle(title)
+                    .setContentText(content)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
+
+            try {
+                NotificationManagerCompat.from(this).notify(1003, builder.build());
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+
+            // Lưu thông báo nếu chưa có
+            Cursor checkCursor = db.rawQuery(
+                    "SELECT 1 FROM Notifications WHERE UserId = ? AND Type = 'reminder' AND RelatedId = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(bookingId)}
+            );
+            boolean alreadyNotified = checkCursor.moveToFirst();
+            checkCursor.close();
+
+            if (!alreadyNotified) {
+                db.execSQL("INSERT INTO Notifications (UserId, Title, Content, Type, IsRead, RelatedId) " +
+                                "VALUES (?, ?, ?, 'reminder', 0, ?)",
+                        new Object[]{userId, title, content, bookingId});
+            }
+        }
+
+        cursor.close();
+        db.close();
+    }
+
+
 
     // Gửi thông báo bằng NotificationManagerCompat
     private void sendCartNotification(int count) {

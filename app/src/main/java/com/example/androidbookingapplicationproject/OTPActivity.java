@@ -1,5 +1,6 @@
 package com.example.androidbookingapplicationproject;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -119,12 +120,15 @@ public class OTPActivity extends AppCompatActivity {
                 String endTime = cartCursor.getString(cartCursor.getColumnIndexOrThrow("EndTime"));
 
                 double totalAmount = 0;
+
+                // Tổng tiền gói
                 Cursor packageCursor = db.rawQuery("SELECT Price FROM Packages WHERE PackageId = ?", new String[]{String.valueOf(packageId)});
                 if (packageCursor.moveToFirst()) {
                     totalAmount += packageCursor.getDouble(0) * quantity;
                 }
                 packageCursor.close();
 
+                // Tổng tiền tiện ích
                 Cursor facCursor = db.rawQuery(
                         "SELECT Facilities.Price, CartFacilities.Quantity FROM CartFacilities " +
                                 "JOIN Facilities ON CartFacilities.FacilityId = Facilities.FacilityId " +
@@ -132,18 +136,18 @@ public class OTPActivity extends AppCompatActivity {
                         new String[]{String.valueOf(cartId)}
                 );
 
-                double facilityTotal = 0;
                 while (facCursor.moveToNext()) {
                     double price = facCursor.getDouble(0);
                     int qty = facCursor.getInt(1);
-                    facilityTotal += price * qty;
+                    totalAmount += price * qty;
                 }
                 facCursor.close();
-                totalAmount += facilityTotal;
 
-                // Insert vào Bookings
-                db.execSQL("INSERT INTO Bookings (UserId, BookingDate, StartTime, EndTime, TotalAmount, Status, PaymentMethod, PaymentStatus) VALUES (?, ?, ?, ?, ?, 'Đã đặt', ?, 'Paid')",
+                // Insert Booking
+                db.execSQL("INSERT INTO Bookings (UserId, BookingDate, StartTime, EndTime, TotalAmount, Status, PaymentMethod, PaymentStatus) " +
+                                "VALUES (?, ?, ?, ?, ?, 'Đã đặt', ?, 'Paid')",
                         new Object[]{userId, bookingDate, startTime, endTime, totalAmount, paymentMethod});
+
                 Cursor lastBookingCursor = db.rawQuery("SELECT last_insert_rowid()", null);
                 lastBookingCursor.moveToFirst();
                 long bookingId = lastBookingCursor.getLong(0);
@@ -171,9 +175,12 @@ public class OTPActivity extends AppCompatActivity {
                 }
                 facilitiesCursor.close();
 
-                // Xoá cart
+                // Xoá giỏ hàng
                 db.execSQL("DELETE FROM CartFacilities WHERE CartId = ?", new Object[]{cartId});
                 db.execSQL("DELETE FROM Cart WHERE CartId = ?", new Object[]{cartId});
+
+                // ✅ Gửi thông báo đến staff
+                sendNotificationToStaff(db, bookingId);
             }
 
             cartCursor.close();
@@ -188,4 +195,21 @@ public class OTPActivity extends AppCompatActivity {
             db.close();
         }
     }
+    private void sendNotificationToStaff(SQLiteDatabase db, long bookingId) {
+        Cursor staffCursor = db.rawQuery("SELECT UserId FROM User WHERE Role = 'staff'", null);
+        while (staffCursor.moveToNext()) {
+            int staffId = staffCursor.getInt(0);
+
+            ContentValues notify = new ContentValues();
+            notify.put("UserId", staffId);
+            notify.put("Title", "Đơn hàng mới cần duyệt");
+            notify.put("Content", "Khách hàng vừa đặt đơn mới. Vui lòng kiểm tra và duyệt.");
+            notify.put("Type", "booking");
+            notify.put("IsRead", 0);
+            notify.put("RelatedId", bookingId);
+            db.insert("Notifications", null, notify);
+        }
+        staffCursor.close();
+    }
+
 }

@@ -70,6 +70,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (role.equals("staff")) {
                     intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("userId", userId);
+                    intent.putExtra("userName", name);
+                    intent.putExtra("email", email);
                 } else if (role.equals("customer")) {
                     intent = new Intent(LoginActivity.this, CustomerDashboardActivity.class);
                     intent.putExtra("userId", userId);

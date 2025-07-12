@@ -87,6 +87,7 @@
             <!-- Mục 1: Đặt chỗ -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
+                android:id="@+id/btnApprove"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
@@ -215,6 +216,7 @@
 
             <!-- Mục 5: Thông báo -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardStaffNotifications"
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
