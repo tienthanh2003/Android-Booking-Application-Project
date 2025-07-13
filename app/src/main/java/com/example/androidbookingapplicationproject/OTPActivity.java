@@ -119,31 +119,36 @@ public class OTPActivity extends AppCompatActivity {
                 String startTime = cartCursor.getString(cartCursor.getColumnIndexOrThrow("StartTime"));
                 String endTime = cartCursor.getString(cartCursor.getColumnIndexOrThrow("EndTime"));
 
-                double totalAmount = 0;
+                // ✅ Tính số giờ (theo định dạng HH:mm)
+                double totalHours = calculateHours(startTime, endTime);
 
-                // Tổng tiền gói
+                // ✅ Tính giá gói
+                double packagePrice = 0;
                 Cursor packageCursor = db.rawQuery("SELECT Price FROM Packages WHERE PackageId = ?", new String[]{String.valueOf(packageId)});
                 if (packageCursor.moveToFirst()) {
-                    totalAmount += packageCursor.getDouble(0) * quantity;
+                    packagePrice = packageCursor.getDouble(0);
                 }
                 packageCursor.close();
 
-                // Tổng tiền tiện ích
+                // ✅ Tính tổng giá tiện ích
+                double totalFacilityPrice = 0;
                 Cursor facCursor = db.rawQuery(
                         "SELECT Facilities.Price, CartFacilities.Quantity FROM CartFacilities " +
                                 "JOIN Facilities ON CartFacilities.FacilityId = Facilities.FacilityId " +
                                 "WHERE CartFacilities.CartId = ?",
                         new String[]{String.valueOf(cartId)}
                 );
-
                 while (facCursor.moveToNext()) {
                     double price = facCursor.getDouble(0);
                     int qty = facCursor.getInt(1);
-                    totalAmount += price * qty;
+                    totalFacilityPrice += price * qty;
                 }
                 facCursor.close();
 
-                // Insert Booking
+                // ✅ Tính tổng tiền: (gói + tiện ích) × số giờ
+                double totalAmount = (packagePrice + totalFacilityPrice) * totalHours;
+
+                // 👉 Lưu Booking
                 db.execSQL("INSERT INTO Bookings (UserId, BookingDate, StartTime, EndTime, TotalAmount, Status, PaymentMethod, PaymentStatus) " +
                                 "VALUES (?, ?, ?, ?, ?, 'Đã đặt', ?, 'Paid')",
                         new Object[]{userId, bookingDate, startTime, endTime, totalAmount, paymentMethod});
@@ -153,7 +158,7 @@ public class OTPActivity extends AppCompatActivity {
                 long bookingId = lastBookingCursor.getLong(0);
                 lastBookingCursor.close();
 
-                // Insert BookingDetails
+                // 👉 Lưu BookingDetails
                 db.execSQL("INSERT INTO BookingDetails (BookingId, PackageId, Quantity, Subtotal) VALUES (?, ?, ?, ?)",
                         new Object[]{bookingId, packageId, quantity, totalAmount});
 
@@ -162,7 +167,7 @@ public class OTPActivity extends AppCompatActivity {
                 long detailId = lastDetailCursor.getLong(0);
                 lastDetailCursor.close();
 
-                // Insert BookingFacilities
+                // 👉 Lưu BookingFacilities
                 Cursor facilitiesCursor = db.rawQuery(
                         "SELECT FacilityId, Quantity FROM CartFacilities WHERE CartId = ?",
                         new String[]{String.valueOf(cartId)}
@@ -175,11 +180,11 @@ public class OTPActivity extends AppCompatActivity {
                 }
                 facilitiesCursor.close();
 
-                // Xoá giỏ hàng
+                // 👉 Xoá giỏ hàng
                 db.execSQL("DELETE FROM CartFacilities WHERE CartId = ?", new Object[]{cartId});
                 db.execSQL("DELETE FROM Cart WHERE CartId = ?", new Object[]{cartId});
 
-                // ✅ Gửi thông báo đến staff
+                // 👉 Gửi thông báo cho nhân viên
                 sendNotificationToStaff(db, bookingId);
             }
 
@@ -195,6 +200,28 @@ public class OTPActivity extends AppCompatActivity {
             db.close();
         }
     }
+
+    private double calculateHours(String start, String end) {
+        try {
+            String[] startParts = start.split(":");
+            String[] endParts = end.split(":");
+
+            int startHour = Integer.parseInt(startParts[0]);
+            int startMinute = Integer.parseInt(startParts[1]);
+
+            int endHour = Integer.parseInt(endParts[0]);
+            int endMinute = Integer.parseInt(endParts[1]);
+
+            double startInHours = startHour + startMinute / 60.0;
+            double endInHours = endHour + endMinute / 60.0;
+
+            return Math.max(0.1, endInHours - startInHours); // đảm bảo > 0
+        } catch (Exception e) {
+            return 1.0; // fallback nếu lỗi
+        }
+    }
+
+
     private void sendNotificationToStaff(SQLiteDatabase db, long bookingId) {
         Cursor staffCursor = db.rawQuery("SELECT UserId FROM User WHERE Role = 'staff'", null);
         while (staffCursor.moveToNext()) {

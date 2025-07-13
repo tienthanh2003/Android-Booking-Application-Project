@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -49,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
+        TextView tvStaffName = findViewById(R.id.tvStaffName);
+        tvStaffName.setText(userName != null ? userName : "Nhân viên");
+
 
         createNotificationChannel();
         checkPendingBookings();

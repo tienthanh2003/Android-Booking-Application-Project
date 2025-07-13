@@ -105,10 +105,15 @@ public class SelectPackageActivity extends AppCompatActivity {
         ArrayList<Integer> facilityIds = new ArrayList<>();
         ArrayList<String> facilityNames = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM Facilities", null);
+        Cursor cursor = db.rawQuery("SELECT FacilityId, Name, Price FROM Facilities", null);
         while (cursor.moveToNext()) {
-            facilityIds.add(cursor.getInt(cursor.getColumnIndexOrThrow("FacilityId")));
-            facilityNames.add(cursor.getString(cursor.getColumnIndexOrThrow("Name")));
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("FacilityId"));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("Name"));
+            double price = cursor.getDouble(cursor.getColumnIndexOrThrow("Price"));
+
+            facilityIds.add(id);
+            // 👉 Thêm giá vào hiển thị
+            facilityNames.add(name + " (+" + (int) price + "đ)");
         }
         cursor.close();
         db.close();
@@ -117,7 +122,9 @@ public class SelectPackageActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Chọn tiện ích kèm theo");
-        builder.setMultiChoiceItems(facilityNames.toArray(new String[0]), checkedItems, (dialog, which, isChecked) -> checkedItems[which] = isChecked);
+        builder.setMultiChoiceItems(facilityNames.toArray(new String[0]), checkedItems,
+                (dialog, which, isChecked) -> checkedItems[which] = isChecked
+        );
 
         builder.setPositiveButton("Thêm vào giỏ", (dialog, which) -> {
             String bookingDate = etBookingDate.getText().toString();
@@ -141,6 +148,7 @@ public class SelectPackageActivity extends AppCompatActivity {
         builder.setNegativeButton("Hủy", null);
         builder.show();
     }
+
 
     private long insertCart(int packageId, String bookingDate, String startTime, String endTime) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
