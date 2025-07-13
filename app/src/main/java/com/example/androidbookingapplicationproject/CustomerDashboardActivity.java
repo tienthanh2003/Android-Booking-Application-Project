@@ -2,12 +2,14 @@ package com.example.androidbookingapplicationproject;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,12 +17,14 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-
 import com.example.androidbookingapplicationproject.db.DatabaseHelper;
+import com.example.androidbookingapplicationproject.models.ChatMessage;
+import com.google.firebase.database.*;
 
 public class CustomerDashboardActivity extends AppCompatActivity {
 
@@ -39,7 +43,6 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         tvCustomerName = findViewById(R.id.tvCustomerName);
         btnLogout = findViewById(R.id.btnLogout);
 
-        // Nhận thông tin người dùng từ LoginActivity
         userId = getIntent().getIntExtra("userId", -1);
         email = getIntent().getStringExtra("email");
         String name = getIntent().getStringExtra("userName");
@@ -54,21 +57,36 @@ public class CustomerDashboardActivity extends AppCompatActivity {
             tvCustomerName.setText(name);
         }
 
-        createNotificationChannel(); // Tạo kênh thông báo
-        checkNotificationPermissionAndNotify(); // Kiểm tra quyền trước khi gửi
+        createNotificationChannel();
+        checkNotificationPermissionAndNotify();
 
-        // Logout
         btnLogout.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
+
         findViewById(R.id.cardNotification).setOnClickListener(v -> {
             Intent intent = new Intent(this, NotificationActivity.class);
             intent.putExtra("userId", userId);
             startActivity(intent);
         });
 
+        CardView cardProfile = findViewById(R.id.cardProfile);
+        cardProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(CustomerDashboardActivity.this, ProfileActivity.class);
+            intent.putExtra("userId", userId);
+            startActivity(intent);
+        });
+
+        CardView cardChat = findViewById(R.id.cardChat);
+        cardChat.setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.example.androidbookingapplicationproject.activities.ChatActivity.class);
+            intent.putExtra("userId", userId);
+            intent.putExtra("userName", tvCustomerName.getText().toString());
+            intent.putExtra("userRole", "customer");
+            startActivity(intent);
+        });
 
         findViewById(R.id.cardMap).setOnClickListener(v ->
                 startActivity(new Intent(this, MapActivity.class)));
@@ -85,29 +103,54 @@ public class CustomerDashboardActivity extends AppCompatActivity {
             intent.putExtra("userId", userId);
             startActivity(intent);
         });
+
+        CardView cardHistory = findViewById(R.id.cardHistory);
+        cardHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BookingHistoryActivity.class);
+            intent.putExtra("userId", userId);
+            startActivity(intent);
+        });
+
     }
 
-    // Gửi thông báo nếu chưa thanh toán
     private void checkNotificationPermissionAndNotify() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
-                // Yêu cầu quyền
                 requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
                         NOTIFICATION_PERMISSION_REQUEST_CODE);
             } else {
                 checkTodayBookingAndNotify();
                 checkUnreadBookingNotification();
                 checkUnpaidCartAndNotify();
+                listenToNewMessages(); // ✅ Thêm lắng nghe tin nhắn
             }
         } else {
             checkTodayBookingAndNotify();
             checkUnreadBookingNotification();
             checkUnpaidCartAndNotify();
+            listenToNewMessages(); // ✅ Android < 13 vẫn nghe tin nhắn
         }
     }
 
-    // Gửi thông báo nếu có giỏ hàng chưa thanh toán
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkTodayBookingAndNotify();
+                checkUnreadBookingNotification();
+                checkUnpaidCartAndNotify();
+                listenToNewMessages(); // ✅ Khi được cấp quyền
+            } else {
+                Toast.makeText(this, "Bạn đã từ chối quyền thông báo!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void checkUnpaidCartAndNotify() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         SQLiteDatabase db = dbHelper.openDatabase();
@@ -128,7 +171,6 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         db.close();
     }
 
-    // thông báo đơn đã duyệt
     private void checkUnreadBookingNotification() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         SQLiteDatabase db = dbHelper.openDatabase();
@@ -142,7 +184,6 @@ public class CustomerDashboardActivity extends AppCompatActivity {
             String title = cursor.getString(0);
             String content = cursor.getString(1);
 
-            // Gửi thông báo hệ thống
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "booking_channel")
                     .setSmallIcon(R.drawable.ic_notifications)
                     .setContentTitle(title)
@@ -156,25 +197,20 @@ public class CustomerDashboardActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // Đánh dấu đã đọc để không thông báo lại lần sau
-            db.execSQL("UPDATE Notifications SET IsRead = 1 WHERE UserId = ? AND Type = 'booking'", new Object[]{userId});
+            db.execSQL("UPDATE Notifications SET IsRead = 1 WHERE UserId = ? AND Type = 'booking'",
+                    new Object[]{userId});
         }
 
         cursor.close();
         db.close();
     }
 
-
-    // thông báo có đơn đặt trong ngày
     private void checkTodayBookingAndNotify() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         SQLiteDatabase db = dbHelper.openDatabase();
 
-        // Lấy ngày hiện tại theo định dạng yyyy-M-d (vd: 2025-7-12)
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-M-d", java.util.Locale.getDefault());
-        String todayStr = sdf.format(new java.util.Date());
+        String todayStr = new java.text.SimpleDateFormat("yyyy-M-d", java.util.Locale.getDefault()).format(new java.util.Date());
 
-        // Truy vấn Booking có ngày hôm nay
         Cursor cursor = db.rawQuery(
                 "SELECT BookingId, BookingDate, StartTime FROM Bookings " +
                         "WHERE UserId = ? AND BookingDate LIKE ? AND Status = 'Đã duyệt'",
@@ -202,7 +238,6 @@ public class CustomerDashboardActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // Lưu thông báo nếu chưa có
             Cursor checkCursor = db.rawQuery(
                     "SELECT 1 FROM Notifications WHERE UserId = ? AND Type = 'reminder' AND RelatedId = ?",
                     new String[]{String.valueOf(userId), String.valueOf(bookingId)}
@@ -221,14 +256,10 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         db.close();
     }
 
-
-
-    // Gửi thông báo bằng NotificationManagerCompat
     private void sendCartNotification(int count) {
         String title = "Bạn còn " + count + " đơn hàng chưa thanh toán";
         String content = "Hãy hoàn tất thanh toán để giữ lịch đặt của bạn.";
 
-        // ✅ Gửi notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "booking_channel")
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(title)
@@ -240,10 +271,8 @@ public class CustomerDashboardActivity extends AppCompatActivity {
             NotificationManagerCompat.from(this).notify(1001, builder.build());
         } catch (SecurityException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Không thể hiển thị thông báo. Hãy cấp quyền!", Toast.LENGTH_SHORT).show();
         }
 
-        // ✅ Lưu thông báo vào database
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         SQLiteDatabase db = dbHelper.openDatabase();
         db.execSQL(
@@ -253,38 +282,88 @@ public class CustomerDashboardActivity extends AppCompatActivity {
         db.close();
     }
 
-
-    // Kết quả yêu cầu quyền từ người dùng
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkUnpaidCartAndNotify();
-            } else {
-                Toast.makeText(this, "Bạn đã từ chối quyền thông báo!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    // Tạo kênh thông báo cho Android O+
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String name = "Booking Channel";
-            String description = "Thông báo đơn đặt chưa thanh toán";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-
-            NotificationChannel channel = new NotificationChannel("booking_channel", name, importance);
-            channel.setDescription(description);
-
+            NotificationChannel channel = new NotificationChannel(
+                    "booking_channel", "Booking Channel", NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("Thông báo đơn đặt chưa thanh toán");
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
             }
+        }
+    }
+
+    // ✅ Thông báo tin nhắn mới khi login
+    private void listenToNewMessages() {
+        String currentUserId = "user_" + userId;
+        DatabaseReference chatRef = FirebaseDatabase.getInstance()
+                .getReference("Messages/conversations/" + currentUserId);
+
+        chatRef.limitToLast(1).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, String previousChildName) {
+                ChatMessage msg = snapshot.getValue(ChatMessage.class);
+
+                if (msg != null && msg.senderId != null && !msg.senderId.equals(currentUserId)) {
+                    showChatNotification(msg);
+                    saveChatNotificationToSQLite(msg);
+                }
+            }
+
+            @Override public void onChildChanged(@NonNull DataSnapshot snapshot, String s) {}
+            @Override public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+            @Override public void onChildMoved(@NonNull DataSnapshot snapshot, String s) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Dashboard", "Lỗi Firebase: " + error.getMessage());
+            }
+        });
+    }
+
+    private void showChatNotification(ChatMessage msg) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "booking_channel")
+                .setSmallIcon(R.drawable.ic_chat)
+                .setContentTitle("Tin nhắn từ " + msg.senderName)
+                .setContentText(msg.message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        NotificationManagerCompat.from(this).notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    private void saveChatNotificationToSQLite(ChatMessage msg) {
+        try {
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            SQLiteDatabase db = dbHelper.openDatabase();
+
+            Cursor cursor = db.rawQuery(
+                    "SELECT 1 FROM Notifications WHERE UserId = ? AND Type = 'chat' AND Content = ?",
+                    new String[]{String.valueOf(userId), msg.message}
+            );
+
+            if (!cursor.moveToFirst()) {
+                ContentValues values = new ContentValues();
+                values.put("UserId", userId);
+                values.put("Title", "Tin nhắn mới từ " + msg.senderName);
+                values.put("Content", msg.message);
+                values.put("Type", "chat");
+                values.put("IsRead", 0);
+                values.putNull("RelatedId");
+
+                db.insert("Notifications", null, values);
+            }
+
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            Log.e("Dashboard", "Lỗi lưu thông báo chat vào SQLite: " + e.getMessage(), e);
         }
     }
 }

@@ -185,6 +185,7 @@
             <!-- Mục 4: Tin nhắn -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
+                android:id="@+id/cardSupport"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
@@ -249,6 +250,7 @@
 
             <!-- Mục 6: Hồ sơ cá nhân -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardProfile"
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"

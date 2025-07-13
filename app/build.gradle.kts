@@ -54,7 +54,13 @@ dependencies {
     // ✅ Thêm JavaMail cho Android
     implementation ("com.sun.mail:android-mail:1.6.7")
     implementation ("com.sun.mail:android-activation:1.6.7")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-analytics")
 }
+apply(plugin = "com.google.gms.google-services")
 
 
 

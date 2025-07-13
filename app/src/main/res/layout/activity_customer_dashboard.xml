@@ -113,6 +113,7 @@
             <!-- Lịch sử -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
+                android:id="@+id/cardHistory"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
@@ -173,33 +174,7 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Thanh toán -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/ic_payment"
-                        app:tint="#FF9800" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Thanh toán"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp"
-                        android:textColor="#000" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+
 
             <!-- Bản đồ -->
             <androidx.cardview.widget.CardView
@@ -234,6 +209,7 @@
             <!-- Chat -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
+                android:id="@+id/cardChat"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
@@ -293,6 +269,7 @@
             <!-- Tài khoản -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
+                android:id="@+id/cardProfile"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
