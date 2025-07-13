@@ -13,6 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.androidbookingapplicationproject.db.DatabaseHelper;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class CartActivity extends AppCompatActivity {
 
     private int userId;
@@ -72,7 +76,22 @@ public class CartActivity extends AppCompatActivity {
             String startTime = cartCursor.getString(cartCursor.getColumnIndexOrThrow("StartTime"));
             String endTime = cartCursor.getString(cartCursor.getColumnIndexOrThrow("EndTime"));
 
-            double itemTotal = price * quantity;
+            // ✅ Tính số giờ dạng thập phân
+            double durationHours = 1.0;
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                Date start = sdf.parse(startTime);
+                Date end = sdf.parse(endTime);
+                if (start != null && end != null) {
+                    long millis = end.getTime() - start.getTime();
+                    durationHours = millis / (1000.0 * 60 * 60); // giữ số thập phân
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // ✅ Tính tiền gói
+            double baseTotal = price;
 
             TextView itemView = new TextView(this);
             itemView.setText("📦 " + packageName + " x" + quantity + " - " + price + "đ\n📅 " + bookingDate + " ⏰ " + startTime + " → " + endTime);
@@ -81,7 +100,7 @@ public class CartActivity extends AppCompatActivity {
             itemView.setPadding(8, 12, 8, 4);
             cartItemsContainer.addView(itemView);
 
-            // Tiện ích
+            // ✅ Tính tiền tiện ích
             Cursor facCursor = db.rawQuery(
                     "SELECT Facilities.Name, Facilities.Price, CartFacilities.Quantity " +
                             "FROM CartFacilities " +
@@ -95,7 +114,8 @@ public class CartActivity extends AppCompatActivity {
                 double facPrice = facCursor.getDouble(1);
                 int facQty = facCursor.getInt(2);
                 double facTotal = facPrice * facQty;
-                itemTotal += facTotal;
+
+                baseTotal += facTotal;
 
                 TextView facView = new TextView(this);
                 facView.setText("↳ " + facName + " x" + facQty + " (+ " + facTotal + "đ)");
@@ -107,8 +127,11 @@ public class CartActivity extends AppCompatActivity {
 
             facCursor.close();
 
+            // ✅ Tổng = (Gói + Tiện ích) * số giờ
+            double itemTotal = baseTotal * durationHours * quantity;
+
             TextView totalItemView = new TextView(this);
-            totalItemView.setText("👉 Tổng mục này: " + itemTotal + "đ");
+            totalItemView.setText("👉 Tổng mục này: " + itemTotal + "đ (x " + durationHours + " giờ)");
             totalItemView.setTextSize(14f);
             totalItemView.setTextColor(Color.BLUE);
             totalItemView.setPadding(16, 8, 8, 8);
@@ -147,6 +170,7 @@ public class CartActivity extends AppCompatActivity {
 
         tvTotalPrice.setText("Tổng: " + totalAmount + "đ");
     }
+
 
     private void deleteCartItem(int cartId) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);

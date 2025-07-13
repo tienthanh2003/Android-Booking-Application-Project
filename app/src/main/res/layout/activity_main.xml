@@ -117,38 +117,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Mục 2: Lịch sử -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/ic_history"
-                        app:tint="#43A047" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Lịch sử"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp"
-                        android:textColor="#000" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <!-- Mục 3: Gói dịch vụ -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardManagePackages"
