@@ -1,41 +1,33 @@
 package com.example.androidbookingapplicationproject;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mapbox.geojson.Point;
-import com.mapbox.maps.MapView;
-import com.mapbox.maps.Style;
-import com.mapbox.maps.plugin.Plugin;
-import com.mapbox.maps.plugin.annotation.AnnotationConfig;
-import com.mapbox.maps.plugin.annotation.AnnotationPlugin;
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager;
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions;
+// TODO: Mapbox dependency removed temporarily
+// import com.mapbox.geojson.Point;
+// import com.mapbox.maps.MapView;
+// ... other mapbox imports
 
 public class MapActivity extends AppCompatActivity {
 
-    private MapView mapView;
+    // private MapView mapView;
     private Button btnBack;
-    private PointAnnotationManager pointAnnotationManager;
+    // private PointAnnotationManager pointAnnotationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        mapView = findViewById(R.id.mapView);
+        // mapView = findViewById(R.id.mapView);
         btnBack = findViewById(R.id.btnBack);
 
-        // Load style and add marker after style is loaded
-        mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS, style -> {
-            initAnnotations();
-            addMarker();
-        });
+        // TODO: Implement map functionality later
+        Toast.makeText(this, "Map feature will be implemented later", Toast.LENGTH_SHORT).show();
 
         btnBack.setOnClickListener(view -> {
             Intent intent = new Intent(MapActivity.this, CustomerDashboardActivity.class);
@@ -43,9 +35,10 @@ public class MapActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-
     }
 
+    // TODO: Uncomment when Mapbox is added back
+    /*
     private void initAnnotations() {
         if (pointAnnotationManager == null) {
             AnnotationPlugin annotationPlugin = (AnnotationPlugin) mapView.getPlugin(Plugin.MAPBOX_ANNOTATION_PLUGIN_ID);
@@ -59,8 +52,6 @@ public class MapActivity extends AppCompatActivity {
             }
         }
     }
-
-
 
     private void addMarker() {
         if (pointAnnotationManager == null) return;
@@ -99,5 +90,5 @@ public class MapActivity extends AppCompatActivity {
         super.onLowMemory();
         mapView.onLowMemory();
     }
-
+    */
 }

@@ -3,20 +3,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-    <!-- MapView -->
-    <com.mapbox.maps.MapView
-        android:id="@+id/mapView"
+    <!-- Placeholder for MapView - will be replaced when Mapbox is added back -->
+    <TextView
+        android:id="@+id/mapPlaceholder"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:text="🗺️\n\nMap Feature\nComing Soon!\n\nMapbox integration will be\nadded later"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textColor="#666"
+        android:background="#E8E8E8"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:mapbox_cameraTargetLat="21.0278"
-        app:mapbox_cameraTargetLng="105.8342"
-        app:mapbox_cameraZoom="14" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Nút quay lại -->
     <Button

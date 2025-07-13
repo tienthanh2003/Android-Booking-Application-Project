@@ -82,6 +82,7 @@
             <!-- Mỗi mục chức năng: Gói, Lịch sử, Giỏ hàng, Thanh toán, Bản đồ, Chat, Thông báo, Tài khoản -->
             <!-- Ví dụ: Gói sản phẩm -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardProducts"
                 android:layout_width="0dp"
                 android:layout_height="140dp"
                 android:layout_columnWeight="1"

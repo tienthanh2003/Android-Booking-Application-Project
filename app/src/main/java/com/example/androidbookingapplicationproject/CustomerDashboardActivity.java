@@ -54,5 +54,27 @@ public class CustomerDashboardActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // Navigate to Product List
+        CardView cardProducts = findViewById(R.id.cardProducts);
+        cardProducts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(CustomerDashboardActivity.this, ProductListActivity.class);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    // Fallback to backup activity if main one fails
+                    try {
+                        Intent intent = new Intent(CustomerDashboardActivity.this, ProductListActivityBackup.class);
+                        startActivity(intent);
+                    } catch (Exception ex) {
+                        // If everything fails, show a message
+                        android.widget.Toast.makeText(CustomerDashboardActivity.this, 
+                            "Lỗi mở danh sách sản phẩm", android.widget.Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
     }
 }

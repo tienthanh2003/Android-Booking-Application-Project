@@ -42,6 +42,11 @@
         <activity android:name=".CartActivity" />
         <activity android:name=".MapActivity" />
         <activity android:name=".ManagePackagesActivity" />
+        <activity android:name=".ProductListActivity" />
+        <activity android:name=".ProductListActivitySimple" />
+        <activity android:name=".ProductListActivityBackup" />
+        <activity android:name=".ProductDetailActivity" />
+        <activity android:name=".ProductDetailEnhancedActivity" />
         <meta-data
             android:name="com.mapbox.token"
             android:value="@string/mapbox_access_token" />
