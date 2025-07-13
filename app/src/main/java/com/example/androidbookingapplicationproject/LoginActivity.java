@@ -70,14 +70,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (role.equals("staff")) {
                     intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("userId", userId);
-                    intent.putExtra("userName", name);
-                    intent.putExtra("email", email);
                 } else if (role.equals("customer")) {
                     intent = new Intent(LoginActivity.this, CustomerDashboardActivity.class);
-                    intent.putExtra("userId", userId);
-                    intent.putExtra("userName", name);
-                    intent.putExtra("email", email); // gửi email
                 } else {
                     Toast.makeText(this, "Không xác định được vai trò người dùng!", Toast.LENGTH_SHORT).show();
                     cursor.close();
@@ -85,8 +79,17 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+// ✅ Truyền đủ thông tin user
+                intent.putExtra("userId", userId);
+                intent.putExtra("userName", name);
+                intent.putExtra("userRole", role);  // 🟢 Thêm dòng này
+                intent.putExtra("email", email);
+
                 cursor.close();
                 db.close();
+
+                startActivity(intent);
+                finish();
 
                 startActivity(intent);
                 finish();
