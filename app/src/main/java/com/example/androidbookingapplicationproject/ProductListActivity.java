@@ -203,6 +203,7 @@ public class ProductListActivity extends AppCompatActivity {
         productList.clear();
         
         // Gói ghế đơn
+<<<<<<< Updated upstream
         productList.add(new Product(1, "Single Seat Package", 1, "Seat", 50));
         productList.add(new Product(2, "Double Seat Package", 2, "Seat", 90));
         productList.add(new Product(3, "Triple Seat Package", 3, "Seat", 130));
@@ -214,6 +215,20 @@ public class ProductListActivity extends AppCompatActivity {
         productList.add(new Product(7, "Extra Large Table Package", 10, "Table", 450));
         
         Toast.makeText(this, "Đã tải dữ liệu mẫu", Toast.LENGTH_SHORT).show();
+=======
+        productList.add(new Product(1, "Gói 1 ghế", 1, "Seat", 50));
+        productList.add(new Product(2, "Gói 2 ghế", 2, "Seat", 90));
+        productList.add(new Product(3, "Gói 3 ghế", 3, "Seat", 130));
+        
+        // Gói bàn
+        productList.add(new Product(4, "Gói 4 ghế 1 bàn", 4, "Table", 150));
+        productList.add(new Product(5, "Gói 6 ghế 1 bàn", 6, "Table", 200));
+        productList.add(new Product(6, "Gói 8 ghế 2 bàn", 8, "Table", 300));
+        productList.add(new Product(7, "Gói 12 ghế 2 bàn", 12, "Table", 350));
+        
+        Log.d(TAG, "Added " + productList.size() + " sample products");
+        Toast.makeText(this, "Đã tải " + productList.size() + " sản phẩm mẫu", Toast.LENGTH_SHORT).show();
+>>>>>>> Stashed changes
     }
     
     // Test method to check basic functionality
@@ -244,10 +259,20 @@ public class ProductListActivity extends AppCompatActivity {
         filteredProductList.clear();
         String searchText = etSearch.getText().toString().toLowerCase().trim();
         
+<<<<<<< Updated upstream
         for (Product product : productList) {
             boolean matchesSearch = searchText.isEmpty() || 
                 product.getName().toLowerCase().contains(searchText) ||
                 product.getDescription().toLowerCase().contains(searchText);
+=======
+        Log.d(TAG, "Filtering with search: '" + searchText + "', filter: " + currentFilter);
+        
+        for (Product product : productList) {
+            boolean matchesSearch = searchText.isEmpty() || 
+                product.getName().toLowerCase().contains(searchText) ||
+                product.getDescription().toLowerCase().contains(searchText) ||
+                matchesVietnameseKeywords(product, searchText);
+>>>>>>> Stashed changes
                 
             boolean matchesFilter = currentFilter.equals("all") ||
                 (currentFilter.equals("seat") && product.getType().equals("Seat")) ||
@@ -255,9 +280,18 @@ public class ProductListActivity extends AppCompatActivity {
                 
             if (matchesSearch && matchesFilter) {
                 filteredProductList.add(product);
+<<<<<<< Updated upstream
             }
         }
         
+=======
+                Log.d(TAG, "Product matched: " + product.getName());
+            }
+        }
+        
+        Log.d(TAG, "Filter result: " + filteredProductList.size() + " products");
+        
+>>>>>>> Stashed changes
         // Update UI
         if (filteredProductList.isEmpty()) {
             recyclerViewProducts.setVisibility(View.GONE);
@@ -269,6 +303,47 @@ public class ProductListActivity extends AppCompatActivity {
         
         productAdapter.updateData(filteredProductList);
     }
+<<<<<<< Updated upstream
+=======
+    
+    private boolean matchesVietnameseKeywords(Product product, String searchText) {
+        // Map Vietnamese keywords to product types
+        String type = product.getType().toLowerCase();
+        
+        // Seat/Chair keywords
+        if (type.equals("seat")) {
+            return searchText.contains("ghe") || searchText.contains("ghế") || 
+                   searchText.contains("cho ngoi") || searchText.contains("chỗ ngồi") ||
+                   searchText.contains("seat") || searchText.contains("chair");
+        }
+        
+        // Table keywords  
+        if (type.equals("table")) {
+            return searchText.contains("ban") || searchText.contains("bàn") ||
+                   searchText.contains("table") || searchText.contains("desk") ||
+                   searchText.contains("lam viec") || searchText.contains("làm việc");
+        }
+        
+        // Additional capacity-based keywords
+        String capacityText = String.valueOf(product.getCapacity());
+        if (searchText.contains(capacityText)) {
+            return true;
+        }
+        
+        // Size keywords
+        if (product.getCapacity() <= 2 && (searchText.contains("nho") || searchText.contains("nhỏ") || searchText.contains("small"))) {
+            return true;
+        }
+        if (product.getCapacity() >= 3 && product.getCapacity() <= 6 && (searchText.contains("vua") || searchText.contains("vừa") || searchText.contains("medium"))) {
+            return true;
+        }
+        if (product.getCapacity() > 6 && (searchText.contains("lon") || searchText.contains("lớn") || searchText.contains("large"))) {
+            return true;
+        }
+        
+        return false;
+    }
+>>>>>>> Stashed changes
 
     @Override
     protected void onResume() {

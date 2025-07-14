@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-<<<<<<< Updated upstream
     xmlns:app="http://schemas.android.com/apk/res-auto"
-=======
->>>>>>> Stashed changes
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -15,18 +12,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-<<<<<<< Updated upstream
         android:background="#fff"
-=======
-        android:background="#FFFFFF"
->>>>>>> Stashed changes
         android:elevation="4dp"
         android:gravity="center_vertical">
 
         <!-- Back Button -->
         <Button
             android:id="@+id/btnBack"
-<<<<<<< Updated upstream
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="←"
@@ -35,14 +27,6 @@
             android:textColor="#333"
             android:minWidth="48dp"
             android:minHeight="48dp" />
-=======
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="←"
-            android:textSize="20sp"
-            android:backgroundTint="@android:color/transparent"
-            android:textColor="#333333" />
->>>>>>> Stashed changes
 
         <!-- Title -->
         <TextView
@@ -52,17 +36,12 @@
             android:text="Gói Dịch Vụ LAB"
             android:textSize="20sp"
             android:textStyle="bold"
-<<<<<<< Updated upstream
             android:textColor="#000"
-=======
-            android:textColor="#000000"
->>>>>>> Stashed changes
             android:gravity="center" />
 
         <!-- Cart Icon -->
         <Button
             android:id="@+id/btnCart"
-<<<<<<< Updated upstream
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🛒"
@@ -71,19 +50,10 @@
             android:textColor="#333"
             android:minWidth="48dp"
             android:minHeight="48dp" />
-=======
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="🛒"
-            android:textSize="20sp"
-            android:backgroundTint="@android:color/transparent"
-            android:textColor="#333333" />
->>>>>>> Stashed changes
 
     </LinearLayout>
 
     <!-- Search Bar -->
-<<<<<<< Updated upstream
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -92,22 +62,12 @@
         app:strokeColor="#CCCCCC"
         app:strokeWidth="1dp"
         app:cardElevation="2dp">
-=======
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:background="#FFFFFF"
-        android:padding="4dp"
-        android:elevation="2dp">
->>>>>>> Stashed changes
 
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Tìm kiếm gói dịch vụ..."
-<<<<<<< Updated upstream
             android:textColor="#000"
             android:textColorHint="#888888"
             android:background="@android:color/transparent"
@@ -159,50 +119,6 @@
 
         </LinearLayout>
     </HorizontalScrollView>
-=======
-            android:textColor="#000000"
-            android:textColorHint="#888888"
-            android:background="@android:color/transparent"
-            android:paddingHorizontal="16dp"
-            android:inputType="text" />
-    </LinearLayout>
-
-    <!-- Filter Chips -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
-
-        <Button
-            android:id="@+id/chipAll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tất cả"
-            android:backgroundTint="#E3F2FD"
-            android:textColor="#2196F3"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/chipSeats"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gói Ghế"
-            android:backgroundTint="#E8F5E8"
-            android:textColor="#4CAF50"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/chipTables"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gói Bàn"
-            android:backgroundTint="#FFF3E0"
-            android:textColor="#FF9800"
-            android:layout_marginEnd="8dp" />
-
-    </LinearLayout>
->>>>>>> Stashed changes
 
     <!-- Products RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -235,11 +151,7 @@
             android:layout_height="wrap_content"
             android:text="Không có gói dịch vụ nào"
             android:textSize="18sp"
-<<<<<<< Updated upstream
             android:textColor="#666"
-=======
-            android:textColor="#666666"
->>>>>>> Stashed changes
             android:gravity="center" />
 
         <TextView
@@ -247,11 +159,7 @@
             android:layout_height="wrap_content"
             android:text="Hãy thử tìm kiếm hoặc thay đổi bộ lọc"
             android:textSize="14sp"
-<<<<<<< Updated upstream
             android:textColor="#999"
-=======
-            android:textColor="#999999"
->>>>>>> Stashed changes
             android:gravity="center"
             android:layout_marginTop="8dp" />
 
