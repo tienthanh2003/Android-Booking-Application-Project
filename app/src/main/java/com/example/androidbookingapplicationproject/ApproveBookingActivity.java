@@ -12,7 +12,7 @@ import com.example.androidbookingapplicationproject.db.DatabaseHelper;
 public class ApproveBookingActivity extends AppCompatActivity {
 
     private int bookingId;
-    private TextView tvCustomerName, tvBookingDate, tvTime, tvPackage, tvTotal;
+    private TextView tvCustomerName, tvCustomerEmail, tvBookingDate, tvTime, tvPackage, tvTotal;
     private LinearLayout layoutFacilities;
     private Button btnApprove, btnReject;
     private boolean isActionable = true;
@@ -38,6 +38,7 @@ public class ApproveBookingActivity extends AppCompatActivity {
         layoutFacilities = findViewById(R.id.layoutFacilities);
         btnApprove = findViewById(R.id.btnApprove);
         btnReject = findViewById(R.id.btnReject);
+        tvCustomerEmail = findViewById(R.id.tvCustomerEmail);
 
         loadBookingDetail();
 
@@ -55,7 +56,7 @@ public class ApproveBookingActivity extends AppCompatActivity {
         SQLiteDatabase db = dbHelper.openDatabase();
 
         Cursor cursor = db.rawQuery(
-                "SELECT b.BookingDate, b.StartTime, b.EndTime, b.TotalAmount, u.Name, " +
+                "SELECT b.BookingDate, b.StartTime, b.EndTime, b.TotalAmount, u.Name, u.Email, " +
                         "p.Name AS PackageName, b.Status " +
                         "FROM Bookings b " +
                         "JOIN User u ON b.UserId = u.UserId " +
@@ -73,6 +74,8 @@ public class ApproveBookingActivity extends AppCompatActivity {
             double total = cursor.getDouble(cursor.getColumnIndexOrThrow("TotalAmount"));
             String packageName = cursor.getString(cursor.getColumnIndexOrThrow("PackageName"));
             String status = cursor.getString(cursor.getColumnIndexOrThrow("Status"));
+            String email = cursor.getString(cursor.getColumnIndexOrThrow("Email"));
+            tvCustomerEmail.setText("📧 Email: " + email);
 
             tvCustomerName.setText("👤 Khách hàng: " + customerName);
             tvBookingDate.setText("📅 Ngày: " + bookingDate);
