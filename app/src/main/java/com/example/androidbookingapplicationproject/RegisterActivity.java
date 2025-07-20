@@ -74,11 +74,19 @@ public class RegisterActivity extends AppCompatActivity {
         String gender = spinnerGender.getSelectedItem().toString();
 
         // Kiểm tra dữ liệu
+        // Kiểm tra dữ liệu
         if (email.isEmpty() || fullname.isEmpty() || password.isEmpty()
                 || phone.isEmpty() || dob.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
+
+
+        if (password.length() < 6 || !password.matches(".*[A-Za-z].*") || !password.matches(".*\\d.*")) {
+            Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự và bao gồm cả chữ và số", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
