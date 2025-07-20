@@ -17,19 +17,15 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.androidbookingapplicationproject.activities.UserListActivity;
 import com.example.androidbookingapplicationproject.db.DatabaseHelper;
-import com.example.androidbookingapplicationproject.models.ChatMessage;
-import com.google.firebase.database.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CHANNEL_ID = "chat_channel";
     private static final String TAG = "MainActivity";
 
     private int userId;
@@ -53,10 +49,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvStaffName = findViewById(R.id.tvStaffName);
         tvStaffName.setText(userName != null ? userName : "Nhân viên");
 
-
         createNotificationChannel();
         checkPendingBookings();
-        listenToNewMessages();
 
         Button btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
@@ -98,104 +92,16 @@ public class MainActivity extends AppCompatActivity {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Kênh chat",
+                    "pending_bookings_channel",
+                    "Thông báo đơn hàng",
                     NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Thông báo tin nhắn mới");
+            channel.setDescription("Thông báo các đơn hàng chờ xử lý");
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
             }
-        }
-    }
-
-    private void listenToNewMessages() {
-        String currentUserId = "staff_" + userId;
-        DatabaseReference chatRef = FirebaseDatabase.getInstance()
-                .getReference("Messages/conversations/" + currentUserId);
-
-        chatRef.limitToLast(1).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, String previousChildName) {
-                Log.d(TAG, "onChildAdded: có tin nhắn mới");
-                ChatMessage msg = snapshot.getValue(ChatMessage.class);
-
-                if (msg != null && msg.senderId != null && !msg.senderId.equals(currentUserId)) {
-                    if (!isMessageAlreadyNotified(msg)) {
-                        showChatNotification(msg);
-                        saveChatNotificationToSQLite(msg);
-                    } else {
-                        Log.d(TAG, "Tin nhắn đã được lưu trước đó, không thông báo lại");
-                    }
-                }
-            }
-
-            @Override public void onChildChanged(@NonNull DataSnapshot snapshot, String s) {}
-            @Override public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
-            @Override public void onChildMoved(@NonNull DataSnapshot snapshot, String s) {}
-            @Override public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Lỗi Firebase: " + error.getMessage());
-            }
-        });
-    }
-
-    private void showChatNotification(ChatMessage msg) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-            Log.w(TAG, "Chưa được cấp quyền POST_NOTIFICATIONS");
-            return;
-        }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_chat)
-                .setContentTitle("Tin nhắn từ " + msg.senderName)
-                .setContentText(msg.message)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat.from(this).notify((int) System.currentTimeMillis(), builder.build());
-    }
-
-    private boolean isMessageAlreadyNotified(ChatMessage msg) {
-        try {
-            DatabaseHelper dbHelper = new DatabaseHelper(this);
-            SQLiteDatabase db = dbHelper.openDatabase();
-
-            Cursor cursor = db.rawQuery(
-                    "SELECT 1 FROM Notifications WHERE UserId = ? AND Type = 'chat' AND Content = ? AND IsRead = 0",
-                    new String[]{String.valueOf(userId), msg.message}
-            );
-
-            boolean exists = cursor.moveToFirst();
-            cursor.close();
-            db.close();
-            return exists;
-        } catch (Exception e) {
-            Log.e(TAG, "Lỗi kiểm tra tin nhắn đã lưu: " + e.getMessage(), e);
-            return true;
-        }
-    }
-
-    private void saveChatNotificationToSQLite(ChatMessage msg) {
-        try {
-            DatabaseHelper dbHelper = new DatabaseHelper(this);
-            SQLiteDatabase db = dbHelper.openDatabase();
-
-            ContentValues values = new ContentValues();
-            values.put("UserId", userId);
-            values.put("Title", "Tin nhắn mới từ " + msg.senderName);
-            values.put("Content", msg.message);
-            values.put("Type", "chat");
-            values.put("IsRead", 0);
-            values.putNull("RelatedId");
-
-            db.insert("Notifications", null, values);
-            db.close();
-        } catch (Exception e) {
-            Log.e(TAG, "Lỗi lưu thông báo chat vào SQLite: " + e.getMessage(), e);
         }
     }
 

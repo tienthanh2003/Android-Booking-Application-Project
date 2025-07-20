@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-// ✅ Truyền đủ thông tin user
+
                 intent.putExtra("userId", userId);
                 intent.putExtra("userName", name);
                 intent.putExtra("userRole", role);  // 🟢 Thêm dòng này
